@@ -166,7 +166,7 @@ htmlhelp_basename = 'pymfdoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, document class [howto/manual]).
 latex_documents = [
-  ('index', 'pymf.tex', u'PyMC Documentation',
+  ('index', 'pymf.tex', u'PyMF Documentation',
    u'', 'manual'),
 ]
 
