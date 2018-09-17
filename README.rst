@@ -15,7 +15,7 @@ and use the flat-sky approximation.
 Documentation
 -------------
 
-Online documentation is available at `pyMF.readthedocs.io <https://mf-tools.readthedocs.io/>`_.
+Online documentation is available at `pymf.readthedocs.io <pymf.readthedocs.io/>`_.
 
 License
 -------
