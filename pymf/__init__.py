@@ -1,18 +1,16 @@
 # -*- coding: utf-8 -*-
-
 # 
-#  This file is part of pyMF.
+#  This file is part of PyMF.
 # 
-#  pyMF is free software; you can redistribute it and/or modify
+#  PyMF is free software; you can redistribute it and/or modify
 #  it under the terms of the MIT License.
 # 
-#  pyMF is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  provided copy of the MIT License for more details.
-# 
-# 
-"""pyMF is a python implementation of matched filtering techniques for 
+#  PyMF is distributed in the hope that it will be useful,but 
+#  WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+#  the provided copy of the MIT License for more details.
+
+"""PyMF is a python implementation of matched filtering techniques for 
    applications in astronomy.
 """
 

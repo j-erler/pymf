@@ -3,7 +3,7 @@
 .. currentmodule:: pymf
 
 
-:mod:`pyMF` -- What's available
+:mod:`PyMF` -- What's available
 ===================================
 
 single-frequency matched filters

@@ -1,4 +1,4 @@
-pyMF license
+PyMF license
 ============
 
 The MIT License (MIT)

@@ -1,8 +1,8 @@
-pyMF
-=========
+PyMF
+====
 
-**pyMF** is an MIT licensed pure-Python implementation of several matched filtering 
-image processing techniques. These methods are designed for applications in astronomy 
+**PyMF** is a pure-Python implementation of several matched filtering image 
+processing techniques. These methods are designed for applications in astronomy 
 and use the flat-sky approximation.
 
 .. image:: https://img.shields.io/badge/GitHub-j--erler%2Fpymf-blue.svg?style=flat
@@ -22,5 +22,5 @@ License
 
 Copyright 2018 Jens Erler and contributors.
 
-pyMF is free software made available under the MIT License. For details see
+PyMF is free software made available under the MIT License. For details see
 the LICENSE file.

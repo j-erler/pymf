@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# pyMF documentation build configuration file, created by
+# PyMF documentation build configuration file, created by
 # sphinx-quickstart on Fri Sep 14 13:06:27 2018.
 #
 # This file is execfile()d with the current directory set to its containing dir.
@@ -166,7 +166,7 @@ htmlhelp_basename = 'pymfdoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, document class [howto/manual]).
 latex_documents = [
-  ('index', 'pymf.tex', u'mf\_tools Documentation',
+  ('index', 'pymf.tex', u'PyMC Documentation',
    u'', 'manual'),
 ]
 
