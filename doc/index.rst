@@ -28,6 +28,21 @@ PyMF is being actively developed on `GitHub <https://github.com/j-erler/pymf>`_.
    :maxdepth: 2
    :caption: Contents:
 
+Acknowledgement
+---------------
+
+Please cite `Erler Ramos-Ceja, Basu & Bertoldi (2018)
+<https://arxiv.org/abs/1809.06446>`_ if you find this code useful in your
+research.
+The BibTeX entry for the paper is::
+
+    @ARTICLE{2018arXiv180906446E,
+        author = {{Erler}, J. and {Ramos-Ceja}, M.~E. and {Basu}, K. and {Bertoldi}, F.},
+         title = "{Introducing constrained matched filters for improved separation of point sources from galaxy clusters}",
+       journal = {ArXiv e-prints},
+          year = 2018,
+        eprint = {1809.06446}
+    }
 
 Installation
 ---------
