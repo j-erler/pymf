@@ -21,7 +21,9 @@ PyMF is being actively developed on `GitHub <https://github.com/j-erler/pymf>`_.
     :target: https://pymf.readthedocs.io/en/latest/index.html#
 .. image:: https://img.shields.io/badge/license-MIT-red.svg?style=flat
     :target: https://github.com/j-erler/pymf/blob/master/LICENSE    
-
+.. image:: https://img.shields.io/badge/arXiv%3A-1809.06446-orange.svg?style=flat
+    :target: https://arxiv.org/abs/1809.06446
+    
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
