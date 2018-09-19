@@ -5,8 +5,8 @@ PyMF
 image processing techniques, namely the 
 `matched filter <http://dx.doi.org/10.1093/mnras/279.2.545>`_, 
 `matched multifilter <http://dx.doi.org/10.1046/j.1365-8711.2002.05704.x>`_ and the newly 
-introduced `constrained matched filter <http://dx.doi.org/10.1093/mnras/279.2.545>`_ and
-`constrained matched mutifilter <http://dx.doi.org/10.1093/mnras/279.2.545>`_. These techniques
+introduced `constrained matched filter <https://arxiv.org/abs/1809.06446>`_ and
+`constrained matched mutifilter <https://arxiv.org/abs/1809.06446>`_. These techniques
 are designed for applications in astronomy and use the flat-sky approximation.
 
 This documentation provides an overview on the installation process and the available 
