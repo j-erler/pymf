@@ -22,7 +22,7 @@ Online documentation is available at `pymf.readthedocs.io <https://pymf.readthed
 Acknowledgement
 ---------------
 
-Please cite `Erler Ramos-Ceja, Basu & Bertoldi (2018)
+Please cite `Erler, Ramos-Ceja, Basu & Bertoldi (2018)
 <https://arxiv.org/abs/1809.06446>`_ if you find this code useful in your
 research.
 The BibTeX entry for the paper is::
