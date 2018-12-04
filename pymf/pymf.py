@@ -11,7 +11,7 @@
 #  the provided copy of the MIT License for more details.
 
 import numpy as np
-
+import time
 
 def corr2cov(corr, var):
 	'''Converts a given correlation matrix into a covariance matrix 
@@ -42,25 +42,25 @@ def rad_profile(image, pixel_size_arcmin, return_k=False):
 	Parameters
 	----------
 	image: 2D float or complex array
-		Input image.
+	  Input image.
 	pixel_size_arcmin: float
-		Pixel size in arcmin.
+	  Pixel size in arcmin.
 	return_k: bool, optional
-		If set to True, the provided image is assumed to be a power spectrum
-		and the x-coordinate of the returned data is converted to the 
-		two-dimensional spatial frequency k. Default: None	
+	  If set to True, the provided image is assumed to be a power spectrum
+	  and the x-coordinate of the returned data is converted to the 
+	  two-dimensional spatial frequency k. Default: None	
 
 	Returns
 	-------
 	kradialprofile: float array
-		x-coordinate of the radial profile. Either the radial separation 
-		from the image center or spatial frequency k, depending on the 
-		value of the variable return_k.
+	  x-coordinate of the radial profile. Either the radial separation 
+	  from the image center or spatial frequency k, depending on the 
+	  value of the variable return_k.
 	radialprofile: float or complex array
-		azimuthally averaged radial profile.
+	  azimuthally averaged radial profile.
 
 	''' 
-	
+
 	nxpix, nypix = image.shape[0], image.shape[1]
 
 	YY, XX = np.indices((image.shape))
@@ -70,22 +70,16 @@ def rad_profile(image, pixel_size_arcmin, return_k=False):
 		k = 360/(pixel_size_arcmin/60.)*np.sqrt(((XX-nxpix//2)/nxpix)**2 + ((YY-nypix//2)/nypix)**2)
 	else:
 		k = np.copy(r)
-		
+
 	#r = np.round(r).astype(np.int)
-	r_int = r.astype(np.int).ravel()
-	k = k.ravel()
-	image = image.ravel()
+	r_int = r.astype(np.int)
 
-	uniq = np.unique(r_int.ravel())
+	weight = np.bincount(r_int.ravel())
+	kradialprofile = np.bincount(r_int.ravel(), k.ravel()) / weight
+	radialprofile_real = np.bincount(r_int.ravel(), np.real(image.ravel())) / weight
+	radialprofile_imag = np.bincount(r_int.ravel(), np.imag(image.ravel())) / weight
+	radialprofile = radialprofile_real + radialprofile_imag*1j
 
-	kradialprofile = np.zeros(len(uniq))
-	radialprofile = np.zeros(len(uniq), dtype=image.dtype)
-
-	for i in np.arange(len(uniq)):
-		index = np.where(r_int == uniq[i])[0]
-		kradialprofile[i] = np.mean(k[index])
-		radialprofile[i] = np.mean(image[index])
-				
 	return(kradialprofile, radialprofile)
 
 
@@ -151,18 +145,19 @@ def cross_spec(images, pixel_size_arcmin, return_k=False, global_cross=False):
 	nf = images.shape[0]
 	npix = images.shape[1] * images.shape[2]
 
-	cc_maps = np.array(np.zeros((nf,nf,npix)), dtype=np.complex128)
+	cc_maps = np.array(np.zeros((npix,nf,nf)), dtype=np.complex128)
 
 	if global_cross is False:
 
 		for i in np.arange(nf):
 			FK1 = np.fft.fftshift((np.fft.fft2(images[i,:,:], norm=None))) / npix
-			for j in np.arange(nf):
+			for j in np.arange(i+1):
 				FK2 = np.fft.fftshift((np.fft.fft2(images[j,:,:], norm=None))) / npix
 				cc = FK1*np.conj(FK2)
 				k, Ck = rad_profile(cc, pixel_size_arcmin, return_k=return_k)
 				cc_map = make_filter_map(cc, k, Ck)
-				cc_maps[i,j,:] = cc_map.reshape(npix)
+				cc_maps[:,i,j] = cc_map.reshape(npix)
+				cc_maps[:,j,i] = cc_map.reshape(npix)
 
 	else:
 
@@ -174,7 +169,7 @@ def cross_spec(images, pixel_size_arcmin, return_k=False, global_cross=False):
 			power[i,:] = make_filter_map(images[0,:,:], k, Pk).reshape(npix)
       
 		for i in np.arange(npix):
-			cc_maps[:,:,i] = corr2cov(corr, power[:,i])
+			cc_maps[i,:,:] = corr2cov(corr, power[:,i])
 		
 	return(cc_maps)
 
@@ -248,10 +243,15 @@ def filter_map_mf(image, source, noise_map=None, sigma_noise=None):
 	npix = image.shape[0] * image.shape[1]
 
 	#compute FFTs
+	t1 = time.time()
 	source_ft = np.fft.fftshift(np.fft.fft2(source)) / npix
 	image_ft = np.fft.fftshift(np.fft.fft2(image)) / npix
+	t2 = time.time()
+	print("FFTs: ", t2-t1)
 
 	#compute noise power spectrum
+
+	t1 = time.time()
 	if noise_map is not None:
 		k, noise_ps = power_spec(noise_map, 1)
 	elif sigma_noise is not None:
@@ -259,7 +259,10 @@ def filter_map_mf(image, source, noise_map=None, sigma_noise=None):
 		k, noise_ps = rad_profile(noise_ft, 1)
 	else:
 		k, noise_ps = power_spec(image, 1)
-
+	t2 = time.time()
+	print("profile: ", t2-t1)
+	
+	t1 = time.time()
 	ps_map = make_filter_map(image, k, noise_ps)
 
 	#compute filter
@@ -268,6 +271,8 @@ def filter_map_mf(image, source, noise_map=None, sigma_noise=None):
 	#compute results
 	filtered_image = np.fft.ifftshift(np.real(np.fft.ifft2(np.fft.ifftshift(filter_ft*image_ft)))) * npix
 	noise = np.sqrt(np.real(np.sum(filter_ft**2*ps_map)))
+	t2 = time.time()
+	print("rest: ", t2-t1)
 
 	return(filtered_image, filter_ft, noise)
 
@@ -337,7 +342,7 @@ def filter_map_cmf(image, templates, response, noise_map=None, sigma_noise=None)
 
 	filter_matrix = abs(template_ft.reshape(n_temp, npix))
 	for i in np.arange(n_temp):
-		filter_matrix[i,:] /= ps_map.reshape(npix)
+		filter_matrix[i,:] = filter_matrix[i,:] / ps_map.reshape(npix)
 
 	filter_ft = (response@np.linalg.inv(norm_matrix)@filter_matrix)
 	filter_ft = filter_ft.reshape(nxpix, nypix)
@@ -349,7 +354,7 @@ def filter_map_cmf(image, templates, response, noise_map=None, sigma_noise=None)
 	return(filtered_image, filter_ft, noise)
 
 
-def filter_map_mmf(images, source, spec, noise_maps=None, sigma_noise=None, no_cross = False, global_cross=False):
+def filter_map_mmf(images, source, spec, noise_maps=None, sigma_noise=None, no_cross = False, global_cross=False, vectorize = True):
 	'''Computes and applies a matched multifilter to a set of multi-frequency map. The 
        filter is build from provided spatial and spectral source templates and the cross 
        spectrum of a set of maps at different frequencies.
@@ -385,6 +390,10 @@ def filter_map_mmf(images, source, spec, noise_maps=None, sigma_noise=None, no_c
 		If set to True, the cross power of the maps is computed globally
 		(i.e. averaged over the full maps / all scales). If False, the 
 		cross power is computed at each spatial frequency. Default: False
+	vectorize: bool, optional
+		If set to True, additional vectorization will be applied in order to increase 
+		performance. The un-vectorized code will be removed in the next release.
+		Default: True
 
 	Returns
 	-------
@@ -401,50 +410,83 @@ def filter_map_mmf(images, source, spec, noise_maps=None, sigma_noise=None, no_c
 	nf, nxpix, nypix = images.shape[0], images.shape[1], images.shape[2]
 	npix = nxpix*nypix
 
+	t1 = time.time()
 	#compute FFTs
-	tau = np.zeros((nf, npix),dtype=np.complex128)
+	tau = np.zeros((npix, nf),dtype=np.complex128)
 	for i in np.arange(nf):
 		if source.shape[0] == nf:
 			source_ft = np.fft.fftshift(np.fft.fft2(source[i,:,:])) / npix
 		else: 
 			source_ft = np.fft.fftshift(np.fft.fft2(source)) / npix
 		source_ft = source_ft.reshape(npix)
-		tau[i,:] = spec[i]*source_ft
+		tau[:,i] = spec[i]*source_ft
+	t2 = time.time()
+	print("FFTs ", t2-t1)
 
+	t1 = time.time()
 	#compute noise power spectrum
 	if noise_maps is not None:
 		cc_maps = np.real(cross_spec(noise_maps, 1, global_cross=global_cross))
 	elif sigma_noise is not None:
-		cc_maps = np.zeros((nf,nf,npix))
+		cc_maps = np.zeros((npix,nf,nf))
 		for i in np.arange(nf):
 			noise_ps = np.ones_like(images[0,:,:]) * sigma_noise[i]**2 / npix
-			cc_maps[i,i,:] = noise_ps.reshape(npix)
+			cc_maps[:,i,i] = noise_ps.reshape(npix)
 	else:
 		cc_maps = np.real(cross_spec(images, 1, global_cross=global_cross))
 
+	t2 = time.time()
+	print("cross_spectra ", t2-t1)
+
+	t1 = time.time()
 	#compute filters
 	filters = np.zeros((nf, npix),dtype=np.complex128)
 	norm = np.zeros(npix,dtype=np.complex128)
-	for i in np.arange(npix):
-		try:
-			if no_cross is True:
-				C_inverse = np.linalg.inv(cc_maps[:,:,i]*np.identity(6))
-			else:
-				C_inverse = np.linalg.inv(cc_maps[:,:,i])
+	if vectorize is False:
+		for i in np.arange(npix):
+			try:
+				if no_cross is True:
+					C_inverse = np.linalg.inv(cc_maps[i,:,:]*np.identity(nf))
+				else:
+					C_inverse = np.linalg.inv(cc_maps[i,:,:])
 
-			F = tau[:,i]
-			filters[:,i] = (C_inverse@F)
-			norm[i] = (np.transpose(F)@C_inverse@F)
+				F = tau[i,:]
+				filters[:,i] = (C_inverse@F)
+				norm[i] = (np.transpose(F)@C_inverse@F)
 
-		except:
-			#print('Matrix inversion failed at pixel: ', i)
-			filters[:,i] = filters[:,i-1]
-			norm[i] = norm[i-1]
+			except:
+				#print('Matrix inversion failed at pixel: ', i)
+				filters[:,i] = filters[:,i-1]
+				norm[i] = norm[i-1]
 
-		if i == nxpix*nypix/2 + nxpix/2:
-			filters[:,i] = filters[:,i-1]
-			norm[i] = norm[i-1]
+			if i == nxpix*nypix/2 + nxpix/2:
+				filters[:,i] = filters[:,i-1]
+				norm[i] = norm[i-1]
 
+	else:
+
+		center = int(nxpix*nypix/2 + nxpix/2)
+		if no_cross is True:
+			C_inverse = np.linalg.inv(cc_maps*np.identity(nf))
+		else:
+			try:
+				C_inverse = np.linalg.inv(cc_maps)
+			except:
+				cc_maps[0,:,:] = cc_maps[-1,:,:]
+				cc_maps[center,:,:] = cc_maps[center-1,:,:]
+				C_inverse = np.linalg.inv(cc_maps)
+
+		filters = np.einsum('kij,kj->ki', C_inverse, tau)
+		norm = np.einsum('ki,kij,kj->k', tau, C_inverse, tau)
+
+		filters = np.transpose(filters)
+		filters[:,center] = filters[:,center-1]
+		norm[center] = norm[center-1]
+
+	t2 = time.time()
+	print("comp. filter ", t2-t1)
+
+	t1 = time.time()
 	#compute results
 	noise = np.real(np.sqrt(1/np.sum(norm)))
 	filter_ft = filters.reshape((nf,nxpix,nypix)) / np.sum(norm)
@@ -459,6 +501,9 @@ def filter_map_mmf(images, source, spec, noise_maps=None, sigma_noise=None, no_c
 
 	if (no_cross is True) or (global_cross is True):
 		noise = np.std(filtered_image)
+
+	t2 = time.time()
+	print("finish ", t2-t1)
 
 	return(filtered_image, filter_ft, noise)
 
@@ -534,10 +579,10 @@ def filter_map_cmmf(images, sources, spec, response, noise_maps=None, sigma_nois
 	if noise_maps is not None:
 		cc_maps =  np.real(cross_spec(noise_maps, 1, global_cross=global_cross))
 	elif sigma_noise is not None:
-		cc_maps = np.zeros((nf,nf,npix))
+		cc_maps = np.zeros((npix,nf,nf))
 		for i in np.arange(nf):
 			noise_ps = np.ones_like(images[0,:,:]) * sigma_noise[i]**2 / npix
-			cc_maps[i,i,:] = noise_ps.reshape(npix)
+			cc_maps[:,i,i] = noise_ps.reshape(npix)
 	else:
 		cc_maps = np.real(cross_spec(images, 1, global_cross=global_cross))
 
@@ -546,9 +591,9 @@ def filter_map_cmmf(images, sources, spec, response, noise_maps=None, sigma_nois
 	for i in np.arange(npix):
 		try:
 			if no_cross is True:
-				C_inverse = np.linalg.inv(cc_maps[:,:,i]*np.identity(6))
+				C_inverse = np.linalg.inv(cc_maps[i,:,:]*np.identity(nf))
 			else:
-				C_inverse = np.linalg.inv(cc_maps[:,:,i])
+				C_inverse = np.linalg.inv(cc_maps[i,:,:])
 		
 			F = tau[:,:,i]
 			norm_matrix[:,:,i] = F@C_inverse@np.transpose(F)
@@ -567,9 +612,9 @@ def filter_map_cmmf(images, sources, spec, response, noise_maps=None, sigma_nois
 	for i in np.arange(npix):
 		try:
 			if no_cross is True:
-				C_inverse = np.linalg.inv(cc_maps[:,:,i]*np.identity(6))
+				C_inverse = np.linalg.inv(cc_maps[i,:,:]*np.identity(nf))
 			else:
-				C_inverse = np.linalg.inv(cc_maps[:,:,i])
+				C_inverse = np.linalg.inv(cc_maps[i,:,:])
 			F = tau[:,:,i]
 			filters[:,i] = response@np.linalg.inv(norm_matrix)@F@C_inverse
 
@@ -580,7 +625,7 @@ def filter_map_cmmf(images, sources, spec, response, noise_maps=None, sigma_nois
 		if i == nxpix*nypix/2 + nxpix/2:
 			filters[:,i] = filters[:,i-1]
 
-		variance += np.transpose(filters[:,i])@cc_maps[:,:,i]@filters[:,i]
+		variance += np.transpose(filters[:,i])@cc_maps[i,:,:]@filters[:,i]
 
 	#compute results
 	noise = np.real(np.sqrt(variance))

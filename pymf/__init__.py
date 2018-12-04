@@ -14,7 +14,7 @@
    applications in astronomy.
 """
 
-__version__ = "1.0"
+__version__ = "1.1"
 
 __bibtex__ = """
 

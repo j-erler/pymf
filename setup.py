@@ -11,11 +11,11 @@ if sys.argv[-1] == "publish":
 
 setup(
     name="pymf",
-    version="1.0",
+    version="1.1",
     author="Jens Erler",
     author_email="jens@astro.uni-bonn.de",
     packages=["pymf"],
-    url="",
+    url="https://github.com/j-erler/pymf",
     license="MIT License",
     description=("A python 3 implementation of matched filters and multifilters"),
     long_description=open("README.rst").read(),
