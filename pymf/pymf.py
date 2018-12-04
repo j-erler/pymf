@@ -247,7 +247,7 @@ def filter_map_mf(image, source, noise_map=None, sigma_noise=None):
 	source_ft = np.fft.fftshift(np.fft.fft2(source)) / npix
 	image_ft = np.fft.fftshift(np.fft.fft2(image)) / npix
 	t2 = time.time()
-	print("FFTs: ", t2-t1)
+	#print("FFTs: ", t2-t1)
 
 	#compute noise power spectrum
 
@@ -260,7 +260,7 @@ def filter_map_mf(image, source, noise_map=None, sigma_noise=None):
 	else:
 		k, noise_ps = power_spec(image, 1)
 	t2 = time.time()
-	print("profile: ", t2-t1)
+	#print("profile: ", t2-t1)
 	
 	t1 = time.time()
 	ps_map = make_filter_map(image, k, noise_ps)
@@ -272,7 +272,7 @@ def filter_map_mf(image, source, noise_map=None, sigma_noise=None):
 	filtered_image = np.fft.ifftshift(np.real(np.fft.ifft2(np.fft.ifftshift(filter_ft*image_ft)))) * npix
 	noise = np.sqrt(np.real(np.sum(filter_ft**2*ps_map)))
 	t2 = time.time()
-	print("rest: ", t2-t1)
+	#print("rest: ", t2-t1)
 
 	return(filtered_image, filter_ft, noise)
 
@@ -421,7 +421,7 @@ def filter_map_mmf(images, source, spec, noise_maps=None, sigma_noise=None, no_c
 		source_ft = source_ft.reshape(npix)
 		tau[:,i] = spec[i]*source_ft
 	t2 = time.time()
-	print("FFTs ", t2-t1)
+	#print("FFTs ", t2-t1)
 
 	t1 = time.time()
 	#compute noise power spectrum
@@ -436,7 +436,7 @@ def filter_map_mmf(images, source, spec, noise_maps=None, sigma_noise=None, no_c
 		cc_maps = np.real(cross_spec(images, 1, global_cross=global_cross))
 
 	t2 = time.time()
-	print("cross_spectra ", t2-t1)
+	#print("cross_spectra ", t2-t1)
 
 	t1 = time.time()
 	#compute filters
@@ -484,7 +484,7 @@ def filter_map_mmf(images, source, spec, noise_maps=None, sigma_noise=None, no_c
 		norm[center] = norm[center-1]
 
 	t2 = time.time()
-	print("comp. filter ", t2-t1)
+	#print("comp. filter ", t2-t1)
 
 	t1 = time.time()
 	#compute results
@@ -503,7 +503,7 @@ def filter_map_mmf(images, source, spec, noise_maps=None, sigma_noise=None, no_c
 		noise = np.std(filtered_image)
 
 	t2 = time.time()
-	print("finish ", t2-t1)
+	#print("finish ", t2-t1)
 
 	return(filtered_image, filter_ft, noise)
 
