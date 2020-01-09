@@ -11,7 +11,7 @@ if sys.argv[-1] == "publish":
 
 setup(
     name="pymf",
-    version="1.1",
+    version="1.2",
     author="Jens Erler",
     author_email="jens@astro.uni-bonn.de",
     packages=["pymf"],
