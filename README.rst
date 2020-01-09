@@ -38,7 +38,7 @@ The BibTeX entry for the paper is::
 License
 -------
 
-Copyright 2018 Jens Erler and contributors.
+Copyright 2020 Jens Erler and contributors.
 
 PyMF is free software made available under the MIT License. For details see
 the LICENSE file.
