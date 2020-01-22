@@ -7,8 +7,9 @@ and use the flat-sky approximation.
 
 .. image:: https://img.shields.io/badge/GitHub-j--erler%2Fpymf-blue.svg?style=flat
     :target: https://github.com/j-erler/pymf
-.. image:: https://img.shields.io/badge/docs-passing-green.svg?style=flat
-    :target: https://pymf.readthedocs.io/en/latest/index.html#
+.. image:: https://readthedocs.org/projects/sz-tools/badge/?version=latest
+    :target: https://sz-tools.readthedocs.io/en/latest/?badge=latest
+    :alt: Documentation Status
 .. image:: https://img.shields.io/badge/license-MIT-red.svg?style=flat
     :target: https://github.com/j-erler/pymf/blob/master/LICENSE
 .. image:: https://img.shields.io/badge/arXiv%3A-1809.06446-orange.svg?style=flat
